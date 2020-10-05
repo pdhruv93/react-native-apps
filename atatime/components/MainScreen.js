@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import {Dimensions, Platform,StyleSheet,Text,TouchableOpacity,View} from 'react-native';
-import { Button, Chip } from 'react-native-paper';
+
+import { Button, Chip} from 'react-native-paper';
 import FBLoginButton from './FBLoginButton';
 
 export default MainScreen = (props)=> {
-  
+
   scrollToActivityTagScreen = () =>{
     props.scrollRef.current?.scrollTo({x: 0, y: 0});
   };
@@ -17,7 +18,6 @@ export default MainScreen = (props)=> {
   return (
     
       <>
-
       <View style={[styles.screen, styles.activityTagScreen]}>
         <Text style={{fontSize: 32, color:"white"}}>
         Tag your activities
@@ -71,6 +71,9 @@ export default MainScreen = (props)=> {
   
   );
 };
+
+
+
 
 
 

@@ -13,6 +13,7 @@ import Splash from './components/Splash';
 import LoginScreen from './components/LoginScreen';
 import MainScreenWrapper from './components/MainScreenWrapper';
 
+
 export default App = () => {
 
   const Stack = createStackNavigator();
