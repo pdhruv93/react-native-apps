@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {Dimensions, Platform,StyleSheet,Text,TouchableOpacity,View} from 'react-native';
 import { Button, Chip } from 'react-native-paper';
+import FBLoginButton from './FBLoginButton';
 
-export default MainScreen = (props) => {
+export default MainScreen = (props)=> {
   
   scrollToActivityTagScreen = () =>{
     props.scrollRef.current?.scrollTo({x: 0, y: 0});
@@ -54,6 +55,17 @@ export default MainScreen = (props) => {
           Cool!! Tag More Activities
         </Button>
       </View>
+
+
+      <View style={[styles.screen, styles.profileScreen]}>
+        <Text style={{fontSize: 32, color:"white"}}>
+           Profile and Preferences
+        </Text>
+        <Text>{"\n"}</Text>
+        <FBLoginButton navigation={props.navigation}/>
+      </View>
+
+
     </>
 
   
@@ -71,9 +83,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activityTagScreen: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#F05F40',
   },
   activityViewerScreen: {
+    backgroundColor: '#007bff',
+  },
+  profileScreen: {
     backgroundColor: '#F05F40',
   },
 

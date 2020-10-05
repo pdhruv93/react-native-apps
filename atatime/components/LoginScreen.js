@@ -1,10 +1,21 @@
 import React, {Component} from 'react';
 import {Dimensions,StyleSheet,Text,View} from 'react-native';
+import {AccessToken} from 'react-native-fbsdk';
+
 
 import FBLoginButton from './FBLoginButton';
 
 function LoginScreen({navigation}) {
   
+  setTimeout(() =>{
+      AccessToken.getCurrentAccessToken().then(data => {
+        if(data!=null)
+          navigation.replace('MainScreenWrapper');
+      });
+    } , 1000);
+
+
+
   return (
 
       <View style={[styles.screen, styles.aboutScreen]}>
