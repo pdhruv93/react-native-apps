@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { View } from 'react-native';
 import { LoginButton } from 'react-native-fbsdk';
 
-export default class FBLoginButton extends Component {
-  render() {
+export default FBLoginButton = (props) => {
+
     return (
-      <View>
+      <>
         <LoginButton
           publishPermissions={["email"]}
           onLoginFinished={
@@ -15,14 +15,11 @@ export default class FBLoginButton extends Component {
               } else if (result.isCancelled) {
                 alert("Login was cancelled");
               } else {
-                alert("Login was successful with permissions: " + result.grantedPermissions)
+                props.navigation.replace('MainScreenWrapper');
               }
             }
           }
           onLogoutFinished={() => alert("User logged out")}/>
-      </View>
+      </>
     );
-  }
 };
-
-module.exports = FBLoginButton;

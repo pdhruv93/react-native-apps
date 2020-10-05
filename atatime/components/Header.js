@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {StyleSheet} from 'react-native';
 import { Appbar } from 'react-native-paper';
-import {scrollRef} from './MainScreen'
 
 export default Header = (props) => {
 
@@ -13,7 +12,6 @@ export default Header = (props) => {
     <Appbar.Header style={styles.headerStyle}>
       <Appbar.Action icon="home" onPress={scrollToTop} color='#F05F40'/>
       <Appbar.Content title="@@time" color='#F05F40'/>
-    
     </Appbar.Header>
   );
 };

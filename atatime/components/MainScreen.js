@@ -1,47 +1,21 @@
 import React, {Component} from 'react';
 import {Dimensions, Platform,StyleSheet,Text,TouchableOpacity,View} from 'react-native';
 import { Button, Chip } from 'react-native-paper';
-import FBLoginButton from './FBLoginButton';
 
 export default MainScreen = (props) => {
   
-  scrollToB = () =>{
-    props.scrollRef.current?.scrollTo({x: 0, y: props.screenHeight*1});
+  scrollToActivityTagScreen = () =>{
+    props.scrollRef.current?.scrollTo({x: 0, y: 0});
   };
 
-  scrollToC = () =>{
-    props.scrollRef.current?.scrollTo({x: 0, y: props.screenHeight*2});
+  scrollToActivityViewerScreen = () =>{
+    props.scrollRef.current?.scrollTo({x: 0, y: props.screenHeight*1});
   };
 
 
   return (
     
       <>
-
-      <View style={[styles.screen, styles.aboutScreen]}>
-
-        <Text style={{fontSize: 32, color:"white"}}>
-        We've got what you need!
-        </Text>
-        
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-          mark your current activity with Tags.
-        </Text>
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-          and check how many others are doing the same activity
-        </Text>
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-        And thats it. @@time is ready!!
-        </Text>
-
-        <Button  color="white" mode="contained" style={styles.scrollButton} onPress={scrollToB}>
-          Can't Wait.Start Here!!!
-        </Button>
-
-        <FBLoginButton />
-
-      </View>
-
 
       <View style={[styles.screen, styles.activityTagScreen]}>
         <Text style={{fontSize: 32, color:"white"}}>
@@ -53,7 +27,7 @@ export default MainScreen = (props) => {
         </Text>
         
         <View style={{flexDirection: 'row', flexWrap:'wrap', justifyContent: 'space-evenly', padding: 20}}>
-          <Chip style={[styles.chipStyle,{ backgroundColor: '#ffc107'}]} textStyle={{fontWeight: 'bold'}} onPress={scrollToC}>sleeping</Chip>
+          <Chip style={[styles.chipStyle,{ backgroundColor: '#ffc107'}]} textStyle={{fontWeight: 'bold'}} onPress={scrollToActivityViewerScreen}>sleeping</Chip>
           <Chip style={[styles.chipStyle,{ backgroundColor: '#ffc107'}]} textStyle={{fontWeight: 'bold'}}>running</Chip>
           <Chip style={[styles.chipStyle,{ backgroundColor: '#ffc107'}]} textStyle={{fontWeight: 'bold'}}>walking</Chip>
           <Chip style={[styles.chipStyle,{ backgroundColor: '#ffc107'}]} textStyle={{fontWeight: 'bold'}}>yawning</Chip>
@@ -76,7 +50,7 @@ export default MainScreen = (props) => {
         <Text>
             A
         </Text>
-        <Button color="white" mode="contained" style={styles.scrollButton} onPress={scrollToB}>
+        <Button color="white" mode="contained" style={styles.scrollButton} onPress={scrollToActivityTagScreen}>
           Cool!! Tag More Activities
         </Button>
       </View>
@@ -95,9 +69,6 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  aboutScreen: {
-    backgroundColor: '#F05F40',
   },
   activityTagScreen: {
     backgroundColor: '#007bff',

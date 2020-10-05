@@ -4,7 +4,7 @@ import {View, Text } from 'react-native';
 function Splash({navigation}) {
 
     setTimeout(() =>{
-        navigation.replace('MainScreenWrapper');
+        navigation.replace('Login');
     }, 4000);
 
   return (
