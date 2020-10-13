@@ -8,10 +8,16 @@ import FBLoginButton from './FBLoginButton';
 function LoginScreen({navigation}) {
   
   setTimeout(() =>{
-      AccessToken.getCurrentAccessToken().then(data => {
-        if(data!=null)
-          navigation.replace('MainScreenWrapper');
+
+      AccessToken.getCurrentAccessToken()
+      .then(data => {
+       if(data!=null)
+       {
+         console.log('Redirecting to MainScreenWrapper!!! Response'+JSON.stringify(data));
+         navigation.replace('MainScreenWrapper');
+       }
       });
+
     } , 1000);
 
 
