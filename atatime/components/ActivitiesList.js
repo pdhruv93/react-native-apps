@@ -1,8 +1,9 @@
-import React, {useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext } from 'react';
 import {Dimensions} from 'react-native';
 
 import {Chip} from 'react-native-paper';
 import database from '@react-native-firebase/database';
+import {ActivityContext} from './MainScreen';
 
 
 export default ActivitiesList = (props)=> {
@@ -11,12 +12,14 @@ export default ActivitiesList = (props)=> {
 
     const [activitiesFetchedFromDB, setActivitiesFetchedFromDB] = useState([]);
     const [areActivitiesFetchedFromDB, setAreActivitiesFetchedFromDB] = useState(true);
-    const screenHeight= Dimensions.get('window').height;
 
+    const screenHeight= Dimensions.get('window').height;
     var activitiesRef= database().ref('/activities');
 
+    const {setActivity}=useContext(ActivityContext);
 
-    scrollToActivityViewerScreen = () =>{
+    scrollToActivityViewerScreen = (activityKey) =>{
+        setActivity(activityKey);
         props.scrollRef.current?.scrollTo({x: 0, y: screenHeight*1});
       };
 
@@ -35,13 +38,12 @@ export default ActivitiesList = (props)=> {
       }, []);
 
 
-
     if(areActivitiesFetchedFromDB==true){
 
         return(
 
             Object.keys(activitiesFetchedFromDB).map(key => 
-                <Chip key={key} style={[ { backgroundColor: activitiesFetchedFromDB[key].color }, {margin: 5} ]} textStyle={{fontWeight: 'bold'}} onPress={scrollToActivityViewerScreen}>{key}</Chip>
+                <Chip key={key} style={[ { backgroundColor: activitiesFetchedFromDB[key].color }, {margin: 5} ]} textStyle={{fontWeight: 'bold'}} onPress={ ()=> {scrollToActivityViewerScreen(key)}} >{key}</Chip>
             )
 
 
