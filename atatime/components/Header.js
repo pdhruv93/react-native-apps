@@ -3,6 +3,7 @@ import {Dimensions, StyleSheet, TouchableHighlight} from 'react-native';
 import { Appbar, Avatar} from 'react-native-paper';
 
 export default Header = (props) => {
+  console.log("Inside Header File");
 
   const screenHeight= Dimensions.get('window').height;
 
@@ -16,7 +17,6 @@ export default Header = (props) => {
   };
 
 
-  console.log("Inside Header File");
 
   return (
     
@@ -25,7 +25,7 @@ export default Header = (props) => {
       <Appbar.Content title="@@time" color='#F05F40'/>
 
       <TouchableHighlight onPress={scrollToToProfileSection}>
-        <Avatar.Image size={30} source={{uri: props.profilePicURL}}/>
+        <Avatar.Image size={30} source={{uri: props.userDetails.picture.data.url}}/>
       </TouchableHighlight>
 
     </Appbar.Header>

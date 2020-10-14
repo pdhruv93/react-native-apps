@@ -25,10 +25,10 @@ export default ActivitiesList = (props)=> {
       useEffect(() => {
     
         activitiesRef.on('value', (snapshot) => {
-            let data = snapshot.val();
-            let items = Object.values(data);
 
-            setActivitiesFetchedFromDB(items);
+            let data = snapshot.val();
+
+            setActivitiesFetchedFromDB(data);
             setAreActivitiesFetchedFromDB(true);
             })
     
@@ -40,15 +40,9 @@ export default ActivitiesList = (props)=> {
 
         return(
 
-            activitiesFetchedFromDB.map((item, index) => {
-                console.log(item);
-                if(item!=null)
-                {
-                    return(
-                        <Chip style={[ { backgroundColor: item.color }, {margin: 5} ]} textStyle={{fontWeight: 'bold'}} onPress={scrollToActivityViewerScreen}>{item.name}</Chip>
-                    )
-                }
-            })
+            Object.keys(activitiesFetchedFromDB).map(key => 
+                <Chip key={key} style={[ { backgroundColor: activitiesFetchedFromDB[key].color }, {margin: 5} ]} textStyle={{fontWeight: 'bold'}} onPress={scrollToActivityViewerScreen}>{key}</Chip>
+            )
 
 
         );

@@ -13,7 +13,7 @@ function LoginScreen({navigation}) {
       .then(data => {
        if(data!=null)
        {
-         console.log('Redirecting to MainScreenWrapper!!! Response'+JSON.stringify(data));
+         console.log('User has correct access Token Redirecting to MainScreenWrapper!!! Response');
          navigation.replace('MainScreenWrapper');
        }
       });

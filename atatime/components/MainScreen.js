@@ -1,17 +1,45 @@
-import React, {Component, useState} from 'react';
-import {Dimensions, Platform,StyleSheet,Text,TouchableOpacity,View} from 'react-native';
+import React,{useState} from 'react';
+import {Dimensions, StyleSheet,Text,TouchableOpacity,View} from 'react-native';
 
-import { Button, Chip} from 'react-native-paper';
+import { Button, Switch} from 'react-native-paper';
 import FBLoginButton from './FBLoginButton';
-
 import ActivitiesList from './ActivitiesList';
+import database from '@react-native-firebase/database';
 
 
 export default MainScreen = (props)=> {
 
+  const [chatSwitchState, setChatSwitchState] = React.useState(true);
+  const [locationSwitchState, setLocationSwitchState] = React.useState(true);
+  const [selectedActivity, setSelectedActivity] = useState("0");
+
   scrollToActivityTagScreen = () =>{
     props.scrollRef.current?.scrollTo({x: 0, y: 0});
   };
+
+
+  const onToggleChatSwitch = () => {
+    let temp=!chatSwitchState;
+
+    database().ref('/userPreferences/'+props.userDetails.id).update({
+      allowChat: temp
+    })
+    .then(()=>{
+      setChatSwitchState(temp);
+    })
+  }
+
+
+  const onToggleLocationSwitch = () => {
+    let temp=!locationSwitchState;
+    
+    database().ref('/userPreferences/'+props.userDetails.id).update({
+      showLocation: temp
+    })
+    .then(()=>{
+      setLocationSwitchState(temp);
+    })
+  }
 
  
   return (
@@ -49,6 +77,20 @@ export default MainScreen = (props)=> {
         <Text style={{fontSize: 32, color:"white"}}>
            Profile and Preferences
         </Text>
+        <Text>{"\n"}</Text>
+
+        <Text style={{fontSize: 16, color:"white"}}>Want others to chat with you?</Text>
+        <Switch value={chatSwitchState} onValueChange={onToggleChatSwitch}></Switch>
+
+        <Text>{"\n"}</Text>
+
+        <Text style={{fontSize: 16, color:"white"}}>Want others to view your location?</Text>
+        <Switch value={locationSwitchState} onValueChange={onToggleLocationSwitch}></Switch>
+
+        <Text>{"\n"}</Text>
+        <Text style={{fontSize: 14, color:"white"}}>if you are disabling some feature for yourself, {"\n"} you cannot access that for others too!!</Text>
+        
+
         <Text>{"\n"}</Text>
         <FBLoginButton navigation={props.navigation}/>
       </View>
@@ -90,9 +132,5 @@ const styles = StyleSheet.create({
     minWidth: "50%",
     marginTop: 30
   },
-
-  chipStyle:{
-    margin: 5,
-  }
 
 });

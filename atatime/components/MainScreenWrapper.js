@@ -10,25 +10,15 @@ export default MainScreenWrapper = ({navigation}) => {
 
   const scrollRef=useRef();
 
-  //State in Functional Component
-  const [areProfileParametersFetched, setAreProfileParametersFetched] = useState(false);
-  const [userId, setUserId] = useState(0);
-  //const [userName, setUserName] = useState("star");
-  const [profilePicURL, setProfilePicURL] = useState("");
+  const [areUserDetailsFetched, setAreUserDetailsFetched] = useState(false);
+  const [userDetails, setuserDetails] = useState([]);
 
 
   get_Response_Info = (error, result) => {
-    if (error) {
-      //Alert for the Error
-      console.log(error);
-      Alert.alert('Error fetching data: ' + error.toString());
-    } else {
-      //response alert
-      //console.log(result.picture.data.url);
-      setUserId(result.id);
-      //setUserName(result.name);
-      setProfilePicURL(result.picture.data.url);
-      setAreProfileParametersFetched(true);
+    if(!error)
+    {
+      setuserDetails(result);
+      setAreUserDetailsFetched(true);
     }
   };
 
@@ -53,14 +43,14 @@ export default MainScreenWrapper = ({navigation}) => {
 
   
 
- if(areProfileParametersFetched==true){
+ if(areUserDetailsFetched==true){
 
     return(
 
       <ScrollView style={styles.container} ref={scrollRef} stickyHeaderIndices={[1]}>
             <StatusBar barStyle="dark-content" />
-            <Header scrollRef={scrollRef} profilePicURL={profilePicURL}></Header>
-            <MainScreen scrollRef={scrollRef} navigation={navigation}></MainScreen>
+            <Header scrollRef={scrollRef} userDetails={userDetails}></Header>
+            <MainScreen scrollRef={scrollRef} navigation={navigation} userDetails={userDetails}></MainScreen>
         </ScrollView>
     );
 
@@ -83,6 +73,6 @@ export default MainScreenWrapper = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   }
 });
