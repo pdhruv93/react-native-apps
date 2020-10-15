@@ -16,22 +16,13 @@ export default FBLoginButton = (props) => {
 
         database().ref('/user/'+result.id).set({
           name: result.name,
-          profilePicURL: result.picture.data.url
+          profilePicURL: result.picture.data.url,
+          allowChat: true,
+          showLocation: true
         })
         .then(data =>{
           console.log("User inserted in Database");
         });
-
-
-
-      database().ref('/userPreferences/'+result.id).set({
-        allowChat: true,
-        showLocation: true
-      })
-      .then(data =>{
-        console.log("User Preferences inserted in Database");
-      });
-
 
 
     }

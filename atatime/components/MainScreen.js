@@ -4,6 +4,7 @@ import {Dimensions, StyleSheet,Text,TouchableOpacity,View} from 'react-native';
 import { Button, Switch} from 'react-native-paper';
 import FBLoginButton from './FBLoginButton';
 import ActivitiesList from './ActivitiesList';
+import ActivityViewer from './ActivityViewer';
 import database from '@react-native-firebase/database';
 
 export const ActivityContext = createContext();
@@ -28,7 +29,7 @@ export default MainScreen = (props)=> {
   const onToggleChatSwitch = () => {
     let temp=!chatSwitchState;
 
-    database().ref('/userPreferences/'+props.userDetails.id).update({
+    database().ref('/user/'+props.userDetails.id).update({
       allowChat: temp
     })
     .then(()=>{
@@ -40,7 +41,7 @@ export default MainScreen = (props)=> {
   const onToggleLocationSwitch = () => {
     let temp=!locationSwitchState;
     
-    database().ref('/userPreferences/'+props.userDetails.id).update({
+    database().ref('/user/'+props.userDetails.id).update({
       showLocation: temp
     })
     .then(()=>{
@@ -64,16 +65,18 @@ export default MainScreen = (props)=> {
           
           
             <View style={{flexDirection: 'row', flexWrap:'wrap', justifyContent: 'space-evenly', padding: 20}}>
-              <ActivitiesList scrollRef={props.scrollRef} />
+              <ActivitiesList scrollRef={props.scrollRef} userDetails={props.userDetails} />
             </View>
         </View>
 
 
 
         <View style={[styles.screen, styles.activityViewerScreen]}>
-          <Text>
-            {selectedActivity}
-          </Text>
+          
+          <ActivityViewer selectedActivity={selectedActivity} userDetails={props.userDetails}></ActivityViewer>
+         
+          <Text>{"\n"}</Text>
+
           <Button color="white" mode="contained" style={styles.scrollButton} onPress={scrollToActivityTagScreen}>
             Cool!! Tag More Activities
           </Button>
