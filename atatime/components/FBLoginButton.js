@@ -19,7 +19,8 @@ export default FBLoginButton = (props) => {
           profilePicURL: result.picture.data.url,
           allowChat: true,
           showLocation: true,
-          deviceId : ""
+          deviceId : "",
+          sendNotifications: true
         })
         .then(data =>{
           console.log("User inserted in Database");

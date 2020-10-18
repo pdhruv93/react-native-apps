@@ -19,10 +19,7 @@ export default ActivitiesList = (props)=> {
     const {setActivity}=useContext(ActivityContext);
 
 
-    let currentLocation={latitude : "0", longitude: "0"};
-
-    const saveActivityToDB = (activityKey) =>{
-
+    const saveActivityToDB = async (activityKey, currentLocation) =>{
         console.log("Saving Activity to UserActivities Table");
         database().ref('/userActivities').push({
             userId: props.userDetails.id,
@@ -42,21 +39,55 @@ export default ActivitiesList = (props)=> {
     }
 
 
+     const fetchIdsForSameActivityForUser = async (activityKey) =>{
+        console.log("Fecthing List of all IDs for same activity for current user!!");
+
+        const idsForSameActivityForUser=[];
+
+        await database().ref("/userActivities")
+        .orderByChild('userId').equalTo(props.userDetails.id)
+        .once("value", function(snapshot) {
+            let data = snapshot.val();
+
+            Object.keys(data).map(key => 
+                {
+                    if(data[key].activityId == activityKey)
+                        idsForSameActivityForUser.push(key);
+                }
+            )  
+        });
+
+        return idsForSameActivityForUser;
+    }
 
 
-    const getUserCurrentLocation = (activityKey) =>{
+     const deleteSameActivityForUser = async (idsForSameActivityForUser) =>{
+        console.log("Deleting same acitivties for current user!!"+idsForSameActivityForUser);
+
+        idsForSameActivityForUser.forEach(async (value) => {
+            //console.log("Deleting"+value);
+            await database().ref("/userActivities/"+value).remove();
+        })
+
+    }
+
+
+    const getUserCurrentLocation = async (activityKey) =>{
 
         console.log("Getting current Location for User!!");
+        let currentLocation={latitude : "0", longitude: "0"};
+
         Geolocation.getCurrentPosition(
             (position) => {
               console.log(position);
               currentLocation.latitude=position.coords.latitude;
               currentLocation.longitude=position.coords.longitude;
-                saveActivityToDB(activityKey);
+
+              return currentLocation;
             },
             (error) => {
               console.log(error.code, error.message);
-                saveActivityToDB(activityKey);
+              return currentLocation;
             },
             { enableHighAccuracy: false, timeout: 8000 }
         );
@@ -65,8 +96,17 @@ export default ActivitiesList = (props)=> {
    
 
 
-    performActivityOnClickOperation = (activityKey) =>{
-        getUserCurrentLocation(activityKey);
+    performActivityOnClickOperation = async (activityKey) =>{
+
+        const idsForSameActivityForUser= await fetchIdsForSameActivityForUser(activityKey);
+        
+        if(idsForSameActivityForUser!=null && idsForSameActivityForUser.length>0)
+            await deleteSameActivityForUser(idsForSameActivityForUser);
+
+        let currentLocation=await getUserCurrentLocation(activityKey);
+        await saveActivityToDB(activityKey, currentLocation);
+
+
       };
 
 

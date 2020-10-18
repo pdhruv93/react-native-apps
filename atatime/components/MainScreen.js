@@ -13,6 +13,7 @@ export default MainScreen = (props)=> {
 
   const [chatSwitchState, setChatSwitchState] = useState(true);
   const [locationSwitchState, setLocationSwitchState] = useState(true);
+  const [notificationSwitchState, setNotificationSwitchState] = useState(true);
   const [selectedActivity, setSelectedActivity] = useState('0');
 
 
@@ -46,6 +47,18 @@ export default MainScreen = (props)=> {
     })
     .then(()=>{
       setLocationSwitchState(temp);
+    })
+  }
+
+
+  const onToggleNotificationSwitch = () => {
+    let temp=!notificationSwitchState;
+    
+    database().ref('/user/'+props.userDetails.id).update({
+      sendNotifications: temp
+    })
+    .then(()=>{
+      setNotificationSwitchState(temp);
     })
   }
 
@@ -98,13 +111,18 @@ export default MainScreen = (props)=> {
           <Switch value={locationSwitchState} onValueChange={onToggleLocationSwitch}></Switch>
 
           <Text>{"\n"}</Text>
+
+          <Text style={{fontSize: 16, color:"white"}}>Send Notifications?</Text>
+          <Switch value={notificationSwitchState} onValueChange={onToggleNotificationSwitch}></Switch>
+
+          <Text>{"\n"}</Text>
           <Text style={{fontSize: 14, color:"white"}}>if you are disabling some feature for yourself, {"\n"} you cannot access that for others too!!</Text>
           
 
           <Text>{"\n"}</Text>
           <FBLoginButton navigation={props.navigation} userDetails={props.userDetails}/>
 
-          <Text>{"\n"}{"\n"}</Text>
+          <Text>{"\n"}</Text>
 
           <Button icon="heart" mode="contained" onPress={() => Linking.openURL('https://m.me/greenpandey')} >
              Say Hi to Developer
