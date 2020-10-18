@@ -18,7 +18,8 @@ export default FBLoginButton = (props) => {
           name: result.name,
           profilePicURL: result.picture.data.url,
           allowChat: true,
-          showLocation: true
+          showLocation: true,
+          deviceId : ""
         })
         .then(data =>{
           console.log("User inserted in Database");
@@ -77,7 +78,16 @@ export default FBLoginButton = (props) => {
           onLogoutFinished={
 
             () => {
-              props.navigation.replace('Login');
+
+              console.log("User is logging out!!");
+              database().ref('/user/'+props.userDetails.id).update({
+                deviceId: ""
+              })
+              .then(()=>{
+                console.log("Device Id Unregisetered!!");
+                props.navigation.replace('Login');
+              })
+
             }
 
           }

@@ -1,5 +1,5 @@
 import React, {createContext, useState} from 'react';
-import {Dimensions, StyleSheet,Text,TouchableOpacity,View} from 'react-native';
+import {Dimensions, StyleSheet,Text,TouchableOpacity,View, Linking} from 'react-native';
 
 import { Button, Switch} from 'react-native-paper';
 import FBLoginButton from './FBLoginButton';
@@ -102,7 +102,14 @@ export default MainScreen = (props)=> {
           
 
           <Text>{"\n"}</Text>
-          <FBLoginButton navigation={props.navigation}/>
+          <FBLoginButton navigation={props.navigation} userDetails={props.userDetails}/>
+
+          <Text>{"\n"}{"\n"}</Text>
+
+          <Button icon="heart" mode="contained" onPress={() => Linking.openURL('https://m.me/greenpandey')} >
+             Say Hi to Developer
+          </Button>
+
         </View>
       </ActivityContext.Provider>
 
