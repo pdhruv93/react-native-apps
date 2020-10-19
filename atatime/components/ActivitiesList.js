@@ -49,12 +49,16 @@ export default ActivitiesList = (props)=> {
         .once("value", function(snapshot) {
             let data = snapshot.val();
 
-            Object.keys(data).map(key => 
-                {
-                    if(data[key].activityId == activityKey)
-                        idsForSameActivityForUser.push(key);
-                }
-            )  
+            if(data!=null)
+            {
+                Object.keys(data).map(key => 
+                    {
+                        if(data[key].activityId == activityKey)
+                            idsForSameActivityForUser.push(key);
+                    }
+                )  
+            }
+
         });
 
         return idsForSameActivityForUser;

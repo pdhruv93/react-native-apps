@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {Text} from 'react-native';
+import {Text, Animated} from 'react-native';
 import database from '@react-native-firebase/database';
-import messaging from '@react-native-firebase/messaging';
+import axios from 'axios';
+
 
 
 
@@ -25,15 +26,19 @@ export default ActivityViewer = (props)=> {
             //console.log("Snapshot Value:"+snapshot.val());
             var userActitvities=snapshot.val();
 
-            Object.keys(userActitvities).map((key) => 
+            if(userActitvities!=null)
+            {
+
+                Object.keys(userActitvities).map((key) => 
                 {
-                    if(new Date(userActitvities[key].startTime) >= activeTime)
+                    if(userActitvities[key].userId!=props.userDetails.id && new Date(userActitvities[key].startTime) >= activeTime)
                     {
                         //console.log(userActitvities[key]);
                         userIdsWithSameActivity.push(userActitvities[key].userId)
                     }
                 }
             )
+            }
 
         });
         
@@ -55,15 +60,18 @@ export default ActivityViewer = (props)=> {
         .once("value", (snapshot) => {
 
             let data=snapshot.val();
-            
-            Object.keys(data).map(key =>{
 
-                if(data[key].sendNotifications==true && userIdsWithSameActivity.includes(key) )
-                {
-                    deviceIDsForAllUsers.push(data[key].deviceId);
-                }
+            if(data!=null)
+            {
+                Object.keys(data).map(key =>{
 
-            });
+                    if(data[key].sendNotifications==true && userIdsWithSameActivity.includes(key) && key!=props.userDetails.id)
+                    {
+                        deviceIDsForAllUsers.push(data[key].deviceId);
+                    }
+    
+                });
+            }
 
         });
       
@@ -79,11 +87,32 @@ export default ActivityViewer = (props)=> {
 
         console.log("Sending Notification to selected Device Ids!!");
 
-        // Send a message to devices with the registered tokens
-        await messaging().sendMulticast({
-            deviceIDsForAllUsers,
-            data: { hello: 'world!' },
-        });
+        axios.post('https://fcm.googleapis.com/fcm/send',
+            {
+                "registration_ids": deviceIDsForAllUsers,
+                "notification": {
+                    "title": "@@time",
+                    "body": "There is a user with same action as yours. Tap to check!!",
+                    "icon": "ic_notification"
+                }
+            },
+            {
+                headers: 
+                {
+                  'Content-Type': 'application/json',
+                  'Authorization' : 'key=AAAA4bWJScI:APA91bEXP3eOGFuC8XHCTql__GJfxZbC-ashdUoMIrKlgg0ahu9jt-ILfkyLnjDioCBFwhe1jZQrneHj0rhSzdyW08ZAhcNokae2G5mEDh5bsCqm5TzfMTZik2w6cDYpHXzDLQmKO65g'
+                }
+            }
+        )
+        .then(res => {
+            console.log("Sent Notifications to IDs");
+            console.log(res);
+            console.log(res.data);
+        })
+        .catch((error) => {
+            console.log("Some error while sending notifications to devices");
+            console.error(error)
+          })
 
     };
 
@@ -96,9 +125,16 @@ export default ActivityViewer = (props)=> {
         if(props.selectedActivity!="0")
         {
             let userIdsWithSameActivity= await fetchUsersWithSameActivity();
-            let deviceIDsForAllUsers= await fetchDeviceIdsForAllUsers(userIdsWithSameActivity);
-            console.log(":::"+deviceIDsForAllUsers);
-            await sendNotificationToDevices(deviceIDsForAllUsers);
+            //console.log("userIdsWithSameActivity:::"+userIdsWithSameActivity);
+
+            if(userIdsWithSameActivity!=null && userIdsWithSameActivity.length>0)
+            {
+                let deviceIDsForAllUsers= await fetchDeviceIdsForAllUsers(userIdsWithSameActivity);
+                deviceIDsForAllUsers.push("duLgdV8xSHSMpDKEzZ_4ms:APA91bF8WwZfBeRkY0Fz_co03wXd0gROEV6TuKaUrmvAApH72Xmt0bHjbWm2FlWjN-TQKs2TQFt7WzC_o8r89zDY8kR82rVddiqC4FqrKW40UM0OZaQiB4h06PV6lMeANMgrplxZr6gR");
+                //console.log("deviceIDsForAllUsers:::"+deviceIDsForAllUsers);
+                await sendNotificationToDevices(deviceIDsForAllUsers);
+            }
+           
             
         }
     }
