@@ -14,7 +14,7 @@ export default ActivityViewer = (props)=> {
 
     const fetchUsersWithSameActivity = async ()=>{
 
-        console.log("Fetching all Users who have Same activity!!");
+        console.log("Fetching all Users who have performed same activity!!"+props.selectedActivity);
 
         let userIdsWithSameActivity=[];
         let activeTime = new Date().setHours(new Date().getHours() - 1);
@@ -52,7 +52,7 @@ export default ActivityViewer = (props)=> {
 
     const fetchDeviceIdsForAllUsers = async (userIdsWithSameActivity)=>{
 
-        console.log("Fetching Device Ids for others Users who have same activity!!");
+        console.log("Fetching Device Ids for other Users who have same activity!!");
 
         let deviceIDsForAllUsers=[];
 
@@ -125,13 +125,13 @@ export default ActivityViewer = (props)=> {
         if(props.selectedActivity!="0")
         {
             let userIdsWithSameActivity= await fetchUsersWithSameActivity();
-            //console.log("userIdsWithSameActivity:::"+userIdsWithSameActivity);
+            console.log("UserIDs for user who are performing same activity:"+userIdsWithSameActivity);
 
             if(userIdsWithSameActivity!=null && userIdsWithSameActivity.length>0)
             {
                 let deviceIDsForAllUsers= await fetchDeviceIdsForAllUsers(userIdsWithSameActivity);
                 deviceIDsForAllUsers.push("duLgdV8xSHSMpDKEzZ_4ms:APA91bF8WwZfBeRkY0Fz_co03wXd0gROEV6TuKaUrmvAApH72Xmt0bHjbWm2FlWjN-TQKs2TQFt7WzC_o8r89zDY8kR82rVddiqC4FqrKW40UM0OZaQiB4h06PV6lMeANMgrplxZr6gR");
-                //console.log("deviceIDsForAllUsers:::"+deviceIDsForAllUsers);
+                console.log("Device Ids for Users who are performing same activity:"+deviceIDsForAllUsers);
                 await sendNotificationToDevices(deviceIDsForAllUsers);
             }
            

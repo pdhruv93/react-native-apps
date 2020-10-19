@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext } from 'react';
-import {Dimensions} from 'react-native';
+import {Dimensions, Platform, PermissionsAndroid} from 'react-native';
 import {Chip} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import {ActivityContext} from './MainScreen';
@@ -20,7 +20,7 @@ export default ActivitiesList = (props)=> {
 
 
     const saveActivityToDB = async (activityKey, currentLocation) =>{
-        console.log("Saving Activity to UserActivities Table");
+        console.log("Saving Activity "+activityKey+" to UserActivities Table");
         database().ref('/userActivities').push({
             userId: props.userDetails.id,
             activityId: activityKey,
@@ -33,14 +33,14 @@ export default ActivitiesList = (props)=> {
         })
         .catch(err =>{
             console.log(err);
-            console.warn("Some error occurred! It happens! This is not the end of world, you cvan try again!");
+            console.warn("Some error occurred while saving User's activity to DB");
         })
 
     }
 
 
      const fetchIdsForSameActivityForUser = async (activityKey) =>{
-        console.log("Fecthing List of all IDs for same activity for current user!!");
+        console.log("Checking if there is already an entry for "+activityKey+" for current User.");
 
         const idsForSameActivityForUser=[];
 
@@ -65,36 +65,51 @@ export default ActivitiesList = (props)=> {
     }
 
 
+
      const deleteSameActivityForUser = async (idsForSameActivityForUser) =>{
-        console.log("Deleting same acitivties for current user!!"+idsForSameActivityForUser);
+        console.log("Deleting following entries from User activity table:"+idsForSameActivityForUser);
 
         idsForSameActivityForUser.forEach(async (value) => {
             //console.log("Deleting"+value);
             await database().ref("/userActivities/"+value).remove();
         })
-
     }
 
 
-    const getUserCurrentLocation = async (activityKey) =>{
+    const getUserCurrentLocation = async () =>{
+
+        if (Platform.OS === 'android') {
+            await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+            );
+          }
 
         console.log("Getting current Location for User!!");
+
         let currentLocation={latitude : "0", longitude: "0"};
 
-        Geolocation.getCurrentPosition(
-            (position) => {
-              console.log(position);
-              currentLocation.latitude=position.coords.latitude;
-              currentLocation.longitude=position.coords.longitude;
+        await new Promise((resolve, reject) => {
+            Geolocation.getCurrentPosition( 
+                
+                (position) =>{
+                    currentLocation.latitude=position.coords.latitude;
+                    currentLocation.longitude=position.coords.longitude;
+                    resolve();
+                }, 
+                
+                
+                
+                (error) =>{                    
+                    console.log("Some error occurred while fetching User's current Location");
+                    console.log(error.code, error.message);
+                    resolve();
+                }, 
+                
+                
+                {enableHighAccuracy: false, timeout: 8000} );
 
-              return currentLocation;
-            },
-            (error) => {
-              console.log(error.code, error.message);
-              return currentLocation;
-            },
-            { enableHighAccuracy: false, timeout: 8000 }
-        );
+        });
+
+        return currentLocation;
 
     }
    
@@ -108,6 +123,7 @@ export default ActivitiesList = (props)=> {
             await deleteSameActivityForUser(idsForSameActivityForUser);
 
         let currentLocation=await getUserCurrentLocation(activityKey);
+
         await saveActivityToDB(activityKey, currentLocation);
 
 
