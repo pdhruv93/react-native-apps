@@ -27,20 +27,13 @@ function LoginScreen({navigation}) {
       <View style={[styles.screen, styles.aboutScreen]}>
 
         <Text style={{fontSize: 32, color:"white"}}>
-        We've got what you need!
+          We've got what you need!  
         </Text>
         
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-          mark your current activity with Tags.
+        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)", textAlign: "center", margin: 20}}>
+          mark your current activity with Tags. and check how many others are doing the same activity...And thats it. @@time is ready!!
         </Text>
         
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-          and check how many others are doing the same activity
-        </Text>
-
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-        And thats it. @@time is ready!!
-        </Text>
 
         <Text>{"\n"}</Text>
         

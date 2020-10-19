@@ -147,8 +147,8 @@ export default ActivityViewer = (props)=> {
 
     return(
         <>
-            <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
-                "You need imagination in order to {"\n"}imagine a future that doesn't exist".{"\n"} In short, select an activity from top
+            <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)", textAlign: "center", margin: 20}}>
+                "You need imagination in order to imagine a future that doesn't exist". In short, select an activity from top
              </Text>
         </>
     )

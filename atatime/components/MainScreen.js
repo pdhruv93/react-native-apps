@@ -72,7 +72,7 @@ export default MainScreen = (props)=> {
           Tag your activities
           </Text>
         
-          <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)"}}>
+          <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)", textAlign: "center", margin: 20}}>
             choose the tag which closely relates to your activity
           </Text>
           
@@ -116,7 +116,7 @@ export default MainScreen = (props)=> {
           <Switch value={notificationSwitchState} onValueChange={onToggleNotificationSwitch}></Switch>
 
           <Text>{"\n"}</Text>
-          <Text style={{fontSize: 14, color:"white"}}>if you are disabling some feature for yourself, {"\n"} you cannot access that for others too!!</Text>
+          <Text style={{fontSize: 14, color:"white", textAlign: "center", margin: 20}}>if you are disabling some feature for yourself, {"\n"} you cannot access that for others too!!</Text>
           
 
           <Text>{"\n"}</Text>
