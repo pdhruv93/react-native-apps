@@ -1,15 +1,17 @@
-import React, {useState} from 'react';
-import {Text, Animated} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Text, StyleSheet, ScrollView, Dimensions, View, Linking} from 'react-native';
 import database from '@react-native-firebase/database';
 import axios from 'axios';
+import { Avatar, Button} from 'react-native-paper';
 
 
-
-
+const { width } = Dimensions.get('window');
 
 export default ActivityViewer = (props)=> {
 
     console.log("!!!!Inside ActivityViewer Screen!!!!");
+
+    const [isFinalScreenPrepared, setIsFinalScreenPrepared] = useState(false);
 
 
     const fetchUsersWithSameActivity = async ()=>{
@@ -17,6 +19,7 @@ export default ActivityViewer = (props)=> {
         console.log("Fetching all Users who have performed same activity!!"+props.selectedActivity);
 
         let userIdsWithSameActivity=[];
+        let locationForThoseActivities=[];
         let activeTime = new Date().setHours(new Date().getHours() - 1);
 
         await database().ref("/userActivities")
@@ -35,6 +38,7 @@ export default ActivityViewer = (props)=> {
                     {
                         //console.log(userActitvities[key]);
                         userIdsWithSameActivity.push(userActitvities[key].userId)
+                        locationForThoseActivities.push(userActitvities[key].location)
                     }
                 }
             )
@@ -43,7 +47,7 @@ export default ActivityViewer = (props)=> {
         });
         
         //console.log("Returning Value");
-        return userIdsWithSameActivity;
+        return [userIdsWithSameActivity, locationForThoseActivities];
 
     }
 
@@ -83,7 +87,7 @@ export default ActivityViewer = (props)=> {
 
 
 
-    const sendNotificationToDevices = async (deviceIDsForAllUsers)=>{
+    const sendNotificationToDevices = (deviceIDsForAllUsers)=>{
 
         console.log("Sending Notification to selected Device Ids!!");
 
@@ -92,7 +96,7 @@ export default ActivityViewer = (props)=> {
                 "registration_ids": deviceIDsForAllUsers,
                 "notification": {
                     "title": "@@time",
-                    "body": "There is a user with same action as yours. Tap to check!!",
+                    "body": "There is another user with activity "+props.selectedActivity+". Tap to check!!",
                     "icon": "ic_notification"
                 }
             },
@@ -119,30 +123,85 @@ export default ActivityViewer = (props)=> {
 
 
 
-
-    const loadFinalScreen = async () =>{
+    const loadFinalScreen = async ()=>{
 
         if(props.selectedActivity!="0")
         {
-            let userIdsWithSameActivity= await fetchUsersWithSameActivity();
+        
+            let [userIdsWithSameActivity, locationForThoseActivities]= await fetchUsersWithSameActivity();
+
             console.log("UserIDs for user who are performing same activity:"+userIdsWithSameActivity);
 
             if(userIdsWithSameActivity!=null && userIdsWithSameActivity.length>0)
             {
                 let deviceIDsForAllUsers= await fetchDeviceIdsForAllUsers(userIdsWithSameActivity);
-                deviceIDsForAllUsers.push("duLgdV8xSHSMpDKEzZ_4ms:APA91bF8WwZfBeRkY0Fz_co03wXd0gROEV6TuKaUrmvAApH72Xmt0bHjbWm2FlWjN-TQKs2TQFt7WzC_o8r89zDY8kR82rVddiqC4FqrKW40UM0OZaQiB4h06PV6lMeANMgrplxZr6gR");
                 console.log("Device Ids for Users who are performing same activity:"+deviceIDsForAllUsers);
-                await sendNotificationToDevices(deviceIDsForAllUsers);
+                sendNotificationToDevices(deviceIDsForAllUsers);
             }
-           
+
+
+            let finalDetails=[]
+
+            userIdsWithSameActivity.forEach((value, index) => {
             
+                let name="";
+                let profilePicURL="";
+                let showLocation=true;
+                let allowChat=true;
+                let locationName="Helsinki";
+
+                database().ref("/user/"+value)
+                .once('value', (snapshot) => {
+                    let data = snapshot.val();
+                    name=data.name;
+                    profilePicURL=data.profilePicURL;
+                    showLocation=data.showLocation;
+                    allowChat=data.allowChat;
+                })
+
+
+            })
         }
+
+
+        setIsFinalScreenPrepared(true)
     }
 
 
-   
-    loadFinalScreen();
 
+
+    loadFinalScreen(); 
+
+    
+
+    if(isFinalScreenPrepared==true)
+    {
+
+        return(
+            <>
+                <Text style={{fontSize: 18, textAlign: 'center', color:'#F05F40', fontWeight:'bold' }}>Live</Text>
+
+                <ScrollView style={styles.container} horizontal= {true} decelerationRate={0} snapToInterval={width - 60} snapToAlignment={"center"} contentInset={{top: 0,left: 30,bottom: 0,right: 30,}}>
+                    <View style={styles.card}>
+                        <Avatar.Image size={70} source={{uri: 'https://images.unsplash.com/photo-1567226475328-9d6baaf565cf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'}}/>
+                        <Text>{"\n"}</Text>
+                        <Text style={[styles.cardText,{ fontWeight: 'bold'}]} >Dhruv Pandey</Text>
+                        <Text style={styles.cardText}>Helsinki</Text>
+                        <Text>{"\n"}</Text>
+                        <Button mode="contained" onPress={() => Linking.openURL('https://m.me/greenpandey')} >
+                            Chat on Messenger
+                        </Button>
+                    </View>
+                </ScrollView>
+
+            </>
+        )
+
+    }
+        
+
+
+    
 
 
     return(
@@ -155,3 +214,36 @@ export default ActivityViewer = (props)=> {
 
 
 }
+
+
+
+
+
+
+const styles = StyleSheet.create({
+    container: {},
+    card: {
+      marginTop: 100,
+      backgroundColor: '#F05F40',
+      width: width - 80,
+      margin: 10,
+      height: 300,
+      borderRadius: 10,
+      opacity: 0.9,
+      shadowColor: '#000',
+      shadowOffset: { width: 10, height: 10 },
+      shadowOpacity: 0.8,
+      shadowRadius: 4,
+      elevation: 2,
+
+      display: 'flex',
+      alignItems: 'center',
+    padding: 15
+    },
+
+    cardText :{
+        fontSize: 18, 
+        color:"white"
+    }
+  });
+  

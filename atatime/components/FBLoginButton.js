@@ -15,7 +15,7 @@ export default FBLoginButton = (props) => {
     {
 
         database().ref('/user/'+result.id).set({
-          name: result.name,
+          userId:  result.userId,
           profilePicURL: result.picture.data.url,
           allowChat: true,
           showLocation: true,
@@ -56,7 +56,7 @@ export default FBLoginButton = (props) => {
                 AccessToken.getCurrentAccessToken()
                 .then(data => {
                   const processRequest = new GraphRequest(
-                    '/me?fields=name,picture.type(large)',
+                    '/me?name,picture.type(large)',
                     null,
                     get_Response_Info
                   )
