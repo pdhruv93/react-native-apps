@@ -22,8 +22,36 @@ export default MainScreenWrapper = (props) => {
   let userId="", userName="", profilePicURL="", deviceId="", screenName=""; //FB API has discontinued returning screenName. So need to fetch from Firebase.
 
 
+  const createNewEmptyUserInFirebase =() =>{
+    database().ref('/user/'+userId)
+    .set({
+        userName:"", profilePicURL:"", deviceId:"", screenName:"" 
+      }
+    )
+    .then(() =>{
+        generateNewDeviceTokenForUser();
+      }
+    )
+  }
 
-  const updateDetailsToFirebaseAndCreateLocalUser = () =>{
+
+  const generateNewDeviceTokenForUser =() =>{
+    // Register the device with FCM
+    messaging().registerDeviceForRemoteMessages()
+    .then(()=>{
+      
+      messaging().getToken()
+      .then((token)=>{
+        console.log("New Device ID recieved from mesaaging system:"+token);
+        deviceId=token;
+        updateFinalDetailsToFirebaseAndCreateLocalUser();
+      })
+
+    })
+  }
+
+
+  const updateFinalDetailsToFirebase = () =>{
 
     console.log("Updating userName,ProfilePicURL,deviceId to Firebase..screenName will be updated by user manually in Profile section");
     database().ref('/user/'+userId)
@@ -32,10 +60,16 @@ export default MainScreenWrapper = (props) => {
         userName: userName, profilePicURL: profilePicURL, deviceId: deviceId 
       }
     )
+    .then( ()=>{
+       createLocalUser();
+      }
+    )
+  }
 
+
+  const createLocalUser = () =>{
     console.log("Fetched all user parameters. Creating User object for local usage with App!!!");
     setuserDetails({userId: userId, userName: userName, profilePicURL: profilePicURL, deviceId:deviceId, screenName:screenName  });
-
   }
 
 
@@ -59,42 +93,25 @@ export default MainScreenWrapper = (props) => {
         if(snapshot.val()==null)
         {
           console.log("The user does not exists in Firebase Database. Creating new user with empty data...");
-          database().ref('/user/'+userId)
-          .set(
-            {
-              userName:"", profilePicURL:"", deviceId:"", screenName:"" 
-            }
-          )
+          createNewEmptyUserInFirebase();
         }
         else
         {
           console.log("The user already exists in Firebase Database. Not creating new");
-
           console.log("Getting screenName for the current logged in user...");
           screenName=snapshot.val().screenName;
 
-          console.log("Checking if there is some DeviceID associated with the Logged in user for Push Notifiaction...");
-
+          console.log("Checking if there is some DeviceId associated with user!!If not, will generate new");
           if(snapshot.val().deviceId=="")
           {
             console.log("There is no Device ID for this user. Registering new!!");
-            // Register the device with FCM
-            messaging().registerDeviceForRemoteMessages()
-            .then(()=>{
-              
-              messaging().getToken()
-              .then((token)=>{
-                console.log("New Device ID recieved from mesaaging system:"+token);
-                deviceId=token;
-                updateDetailsToFirebaseAndCreateLocalUser();
-              })
-  
-            })
+            generateNewDeviceTokenForUser();
           }
           else
           {
+            console.log("There is already Device ID for this user!!");
             deviceId=snapshot.val();
-            updateDetailsToFirebaseAndCreateLocalUser();
+            createLocalUser();
           }
         }
 
