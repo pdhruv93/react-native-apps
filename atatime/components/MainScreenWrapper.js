@@ -19,18 +19,39 @@ export default MainScreenWrapper = (props) => {
   const scrollRef=useRef();
   const [userDetails, setuserDetails] = useState([]);
 
+  let userId="", userName="", profilePicURL="", deviceId="", screenName=""; //FB API has discontinued returning screenName. So need to fetch from Firebase.
 
-  fetchUserDetailsFromFacebookAndUpdateToFirebaseAndCreateLocalUserInstance = (error, result) => {
+
+
+  const updateDetailsToFirebaseAndCreateLocalUser = () =>{
+
+    console.log("Updating userName,ProfilePicURL,deviceId to Firebase..screenName will be updated by user manually in Profile section");
+    database().ref('/user/'+userId)
+    .update(
+      {
+        userName: userName, profilePicURL: profilePicURL, deviceId: deviceId 
+      }
+    )
+
+    console.log("Fetched all user parameters. Creating User object for local usage with App!!!");
+    setuserDetails({userId: userId, userName: userName, profilePicURL: profilePicURL, deviceId:deviceId, screenName:screenName  });
+
+  }
+
+
+  
+
+  fetchUserDetailsFromFacebook = (error, result) => {
     console.log("Fetching User details for the current user from Facebook API!!!");
 
     if(!error)
     {
-      let userId=result.id;
-      let userName=result.name;
-      let profilePicURL= result.picture.data.url;
-      let deviceId="";
-      let screenName=""; //FB API has discontinued returning screenName. So need to fetch from Firebase.
-
+      userId=result.id;
+      userName=result.name;
+      profilePicURL= result.picture.data.url;
+      deviceId="";
+      screenName=""; //FB API has discontinued returning screenName. So need to fetch from Firebase.
+      
       console.log("Checking if userId "+userId+" exists in Firebase Database...");
       database().ref('/user/'+userId)
       .once('value')
@@ -61,10 +82,11 @@ export default MainScreenWrapper = (props) => {
             messaging().registerDeviceForRemoteMessages()
             .then(()=>{
               
-              await messaging().getToken()
+              messaging().getToken()
               .then((token)=>{
                 console.log("New Device ID recieved from mesaaging system:"+token);
                 deviceId=token;
+                updateDetailsToFirebaseAndCreateLocalUser();
               })
   
             })
@@ -72,19 +94,9 @@ export default MainScreenWrapper = (props) => {
           else
           {
             deviceId=snapshot.val();
+            updateDetailsToFirebaseAndCreateLocalUser();
           }
         }
-
-        console.log("Updating userName,ProfilePicURL,deviceId to Firebase..screenName will be updated by user manually in Profile section");
-        database().ref('/user/'+userId)
-        .update(
-          {
-            userName: userName, profilePicURL: profilePicURL, deviceId: deviceId 
-          }
-        )
-
-        console.log("Fetched all user parameters. Creating User object for local usage with App!!!");
-        setuserDetails({userId: userId, userName: userName, profilePicURL: profilePicURL, deviceId:deviceId, screenName:screenName  });
 
       });
     }
@@ -96,7 +108,7 @@ export default MainScreenWrapper = (props) => {
     AccessToken.getCurrentAccessToken()
     .then(data => {
       
-      const processRequest = new GraphRequest('/me?fields=name,picture.type(large)',null,fetchUserDetailsFromFacebookAndUpdateToFirebaseAndCreateLocalUserInstance);
+      const processRequest = new GraphRequest('/me?fields=name,picture.type(large)',null,fetchUserDetailsFromFacebook);
 
       // Start the graph request(sync call).
       new GraphRequestManager().addRequest(processRequest).start();
