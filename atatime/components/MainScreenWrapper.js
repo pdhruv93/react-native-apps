@@ -1,62 +1,92 @@
-import React,{useRef, useState, useEffect} from 'react';
-import {StatusBar,StyleSheet,ScrollView, Alert} from 'react-native';
-import MainScreen from './MainScreen';
+import React,{useRef, useState, useEffect, createContext} from 'react';
+import {StatusBar,ScrollView, Text, View} from 'react-native';
+
 import Header from './Header';
+import MainScreen from './MainScreen';
+import {styles} from './StyleSheet';
+
 import {AccessToken,GraphRequest,GraphRequestManager} from 'react-native-fbsdk';
 import database from '@react-native-firebase/database';
 import messaging from '@react-native-firebase/messaging';
 
-export default MainScreenWrapper = ({navigation}) => {
+
+export const UtilityContext = createContext();
+
+export default MainScreenWrapper = (props) => {
 
   console.log("!!!!Inside MainScreenWrapper!!!!");
 
   const scrollRef=useRef();
-
-  const [areUserDetailsFetched, setAreUserDetailsFetched] = useState(false);
   const [userDetails, setuserDetails] = useState([]);
 
 
-  get_Response_Info = (error, result) => {
+  fetchUserDetailsFromFacebookAndUpdateToFirebaseAndCreateLocalUserInstance = (error, result) => {
+    console.log("Fetching User details for the current user from Facebook API!!!");
+
     if(!error)
     {
-      
-      console.log("Checking if there is some DeviceID associated with the Logged in user for Push Notifiaction...")
-      database()
-      .ref('/user/'+result.id+"/deviceId")
+      let userId=result.id;
+      let userName=result.name;
+      let profilePicURL= result.picture.data.url;
+      let deviceId="";
+      let screenName=""; //FB API has discontinued returning screenName. So need to fetch from Firebase.
+
+      console.log("Checking if userId "+userId+" exists in Firebase Database...");
+      database().ref('/user/'+userId)
       .once('value')
       .then(snapshot => {
-        console.log('Device Id: ', snapshot.val());
-          if(snapshot.val()=="")
+        if(snapshot.val()==null)
+        {
+          console.log("The user does not exists in Firebase Database. Creating new user with empty data...");
+          database().ref('/user/'+userId)
+          .set(
+            {
+              userName:"", profilePicURL:"", deviceId:"", screenName:"" 
+            }
+          )
+        }
+        else
+        {
+          console.log("The user already exists in Firebase Database. Not creating new");
+
+          console.log("Getting screenName for the current logged in user...");
+          screenName=snapshot.val().screenName;
+
+          console.log("Checking if there is some DeviceID associated with the Logged in user for Push Notifiaction...");
+
+          if(snapshot.val().deviceId=="")
           {
             console.log("There is no Device ID for this user. Registering new!!");
             // Register the device with FCM
-              messaging().registerDeviceForRemoteMessages()
-              .then(()=>{
-                
-                // Get the token
-                messaging().getToken()
-                .then((token)=>{
-                  console.log(token);
-                  database().ref('/user/'+result.id).update({
-                    deviceId: token
-                  })
-                  .then(()=>{
-                    console.log("Device Id Linked!!");
-                  })
-
-
-                })
-
+            messaging().registerDeviceForRemoteMessages()
+            .then(()=>{
+              
+              await messaging().getToken()
+              .then((token)=>{
+                console.log("New Device ID recieved from mesaaging system:"+token);
+                deviceId=token;
               })
+  
+            })
           }
+          else
+          {
+            deviceId=snapshot.val();
+          }
+        }
+
+        console.log("Updating userName,ProfilePicURL,deviceId to Firebase..screenName will be updated by user manually in Profile section");
+        database().ref('/user/'+userId)
+        .update(
+          {
+            userName: userName, profilePicURL: profilePicURL, deviceId: deviceId 
+          }
+        )
+
+        console.log("Fetched all user parameters. Creating User object for local usage with App!!!");
+        setuserDetails({userId: userId, userName: userName, profilePicURL: profilePicURL, deviceId:deviceId, screenName:screenName  });
 
       });
-
-      
-      
-      
-      setuserDetails(result);
-      setAreUserDetailsFetched(true);
     }
   };
 
@@ -66,52 +96,37 @@ export default MainScreenWrapper = ({navigation}) => {
     AccessToken.getCurrentAccessToken()
     .then(data => {
       
-      const processRequest = new GraphRequest(
-        '/me?fields=name,picture.type(large)',
-        null,
-        get_Response_Info
-      )
+      const processRequest = new GraphRequest('/me?fields=name,picture.type(large)',null,fetchUserDetailsFromFacebookAndUpdateToFirebaseAndCreateLocalUserInstance);
+
       // Start the graph request(sync call).
       new GraphRequestManager().addRequest(processRequest).start();
-      })
-      .catch(()=>{
-      });
+    })
 
 
   }, []);
 
-  
 
- if(areUserDetailsFetched==true){
-
+ if(userDetails!=null && Object.keys(userDetails).length>0){
     return(
-
-      <ScrollView style={styles.container} ref={scrollRef} stickyHeaderIndices={[1]}>
+      <UtilityContext.Provider value={{scrollRef, userDetails}} >
+        <ScrollView ref={scrollRef} stickyHeaderIndices={[1]}>
             <StatusBar barStyle="dark-content" />
-            <Header scrollRef={scrollRef} userDetails={userDetails}></Header>
-            <MainScreen scrollRef={scrollRef} navigation={navigation} userDetails={userDetails}></MainScreen>
+            <Header/>
+            <MainScreen navigation={props.navigation}/>
         </ScrollView>
+      </UtilityContext.Provider>
     );
 
   }
 
-    return(
-      <></>
-    )
 
+  return(
+    <View style={[styles.screen, styles.redBackground]}>
+      <Text style={[styles.text, styles.whiteText, {fontSize: 16}]}>
+        wait while we cook the user for you....
+      </Text>
+    </View>
+  )
 
-
-
-
-  
+ 
 };
-
-
-
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  }
-});
