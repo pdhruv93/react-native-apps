@@ -44,7 +44,7 @@ export default MainScreenWrapper = (props) => {
       .then((token)=>{
         console.log("New Device ID recieved from mesaaging system:"+token);
         deviceId=token;
-        updateFinalDetailsToFirebaseAndCreateLocalUser();
+        updateFinalDetailsToFirebase();
       })
 
     })
@@ -69,7 +69,7 @@ export default MainScreenWrapper = (props) => {
 
   const createLocalUser = () =>{
     console.log("Fetched all user parameters. Creating User object for local usage with App!!!");
-    setuserDetails({userId: userId, userName: userName, profilePicURL: profilePicURL, deviceId:deviceId, screenName:screenName  });
+    setuserDetails({userId: userId, userName: userName, profilePicURL: profilePicURL, deviceId : deviceId, screenName : screenName  });
   }
 
 
@@ -110,7 +110,7 @@ export default MainScreenWrapper = (props) => {
           else
           {
             console.log("There is already Device ID for this user!!");
-            deviceId=snapshot.val();
+            deviceId=snapshot.val().deviceId;
             createLocalUser();
           }
         }

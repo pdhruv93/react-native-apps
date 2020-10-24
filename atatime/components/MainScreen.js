@@ -34,7 +34,7 @@ export default MainScreen = (props)=> {
  
 
   return(
-    <ActivityContext.Provider value={{setSelectedActivity}}>
+    <ActivityContext.Provider value={{selectedActivity, setSelectedActivity}}>
 
 
 
@@ -46,7 +46,10 @@ export default MainScreen = (props)=> {
         <Text style={[styles.text, styles.whiteText, {fontSize: 16}]}>
           choose the tag which closely relates to your activity
         </Text>
-          
+        
+        <View style={{flexDirection: 'row', flexWrap:'wrap', justifyContent: 'space-evenly', padding: 20}}>
+          <ActivitiesList/>
+        </View>
           
         <View style={{flexDirection: 'row', flexWrap:'wrap', justifyContent: 'space-evenly', padding: 20}}>    
         </View>
@@ -58,6 +61,10 @@ export default MainScreen = (props)=> {
       <View style={[styles.screen, styles.blueBackground]}>
         <Text>{"\n"}</Text>
 
+        <ScrollView style={styles.container} horizontal= {true} decelerationRate={0} snapToInterval={width - 60} snapToAlignment={"center"} contentInset={{top: 0,left: 30,bottom: 0,right: 30,}} >
+          <ActivityViewer/>
+        </ScrollView>
+        
         <Button color="white" mode="contained" style={styles.scrollButton} onPress={()=>{scrollRef.current?.scrollTo({x: 0, y: 0})}} >
           Cool!! Tag More Activities
         </Button>

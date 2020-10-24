@@ -50,3 +50,9 @@ in build.gradle
 
 6. Facebook Login Android
 https://www.youtube.com/watch?v=lptfpgnwuZM&t=285s
+
+7. Signed APK for Android in React-native
+https://reactnative.dev/docs/signed-apk-android
+
+8. Fingerprint generation for Google APIs(Dev Environment)
+keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android

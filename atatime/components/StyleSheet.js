@@ -41,5 +41,29 @@ export const styles = StyleSheet.create({
       minWidth: "50%",
       marginTop: 30
     },
+
+    container: {},
+    card: {
+      marginTop: 100,
+      backgroundColor: '#F05F40',
+      width: width - 80,
+      margin: 10,
+      height: 300,
+      borderRadius: 10,
+      opacity: 0.9,
+      shadowColor: '#000',
+      shadowOffset: { width: 10, height: 10 },
+      shadowOpacity: 0.8,
+      shadowRadius: 4,
+      elevation: 2,
+      display: 'flex',
+      alignItems: 'center',
+      padding: 15
+    },
+
+    cardText :{
+        fontSize: 18, 
+        color:"white"
+    }
   
   });
