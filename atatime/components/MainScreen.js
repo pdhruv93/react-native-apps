@@ -60,10 +60,8 @@ export default MainScreen = (props)=> {
 
       <View style={[styles.screen, styles.blueBackground]}>
         <Text>{"\n"}</Text>
-
-        <ScrollView style={styles.container} horizontal= {true} decelerationRate={0} snapToInterval={width - 60} snapToAlignment={"center"} contentInset={{top: 0,left: 30,bottom: 0,right: 30,}} >
-          <ActivityViewer/>
-        </ScrollView>
+          
+        <ActivityViewer/>
         
         <Button color="white" mode="contained" style={styles.scrollButton} onPress={()=>{scrollRef.current?.scrollTo({x: 0, y: 0})}} >
           Cool!! Tag More Activities

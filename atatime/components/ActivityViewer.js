@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Text} from 'react-native';
+import {Text, Dimensions, ScrollView, View} from 'react-native';
 import { Avatar, Button} from 'react-native-paper';
 
 import database from '@react-native-firebase/database';
@@ -70,11 +70,12 @@ export default ActivityViewer = (props)=> {
 
     const fetchAllUsersWithSameActivity = async () =>{
         console.log("Fetching all users who are performing same activity...");
-        database().ref('/activities/'+selectedActivity)
+        database().ref('/userActivities/'+selectedActivity)
         .once('value', (snapshot) => {
             let data = snapshot.val();
+            console.log("Successfully Fecthed all users who are performing same activity !!");
+            console.log("Users who are performing same activity:"+JSON.stringify(data));
             setUsersPerformingSameActivity(data);
-            console.log("Successfully Fecthed all users who have performing same activity !!");
             sendNotificationToUsers();
         });
     }
@@ -148,20 +149,25 @@ export default ActivityViewer = (props)=> {
 
     if(usersPerformingSameActivity!=null && Object.keys(usersPerformingSameActivity).length>0 ){
         return(
-            Object.keys(usersPerformingSameActivity).map(key => 
-                
-                <View key={key} style={styles.card}>
-                    <Avatar.Image size={70} source={{ uri:usersPerformingSameActivity[key].profilePicURL }}/>
-                    <Text>{"\n"}</Text>
-                    <Text style={[styles.cardText, styles.boldText]} >{usersPerformingSameActivity[key].userName}</Text>
-                    <Text style={styles.cardText}>{usersPerformingSameActivity[key].location}</Text>
-                    <Text>{"\n"}</Text>
-                    <Button mode="contained" onPress={() => Linking.openURL('https://m.me/'+usersPerformingSameActivity[key].screenName)} >
-                        Chat on Messenger
-                    </Button>
-                </View>
-
-            )
+            <ScrollView style={styles.container} horizontal= {true} decelerationRate={0} snapToInterval={Dimensions.get('window').width - 60} snapToAlignment={"center"} contentInset={{top: 0,left: 30,bottom: 0,right: 30,}} >
+                {
+                    Object.keys(usersPerformingSameActivity).map(key => 
+                        <View key={key} style={styles.card}>
+                            <Text>{"\n"}</Text>
+                            <Avatar.Image size={70} source={{ uri:usersPerformingSameActivity[key].profilePicURL }}/>
+                            <Text>{"\n"}</Text>
+                            <Text style={[styles.cardText, styles.boldText]} >
+                                {key==userDetails.userId ? "It's you" : usersPerformingSameActivity[key].userName}
+                            </Text>
+                            <Text style={styles.cardText}>{usersPerformingSameActivity[key].location}</Text>
+                            <Text>{"\n"}</Text>
+                            <Button mode="contained" style={{display: key==userDetails.userId ? 'none' : '' }} onPress={() => Linking.openURL('https://m.me/'+usersPerformingSameActivity[key].screenName)} >
+                                Chat on Messenger
+                            </Button>
+                        </View>
+                    )
+                }
+            </ScrollView>
         );
     }
 

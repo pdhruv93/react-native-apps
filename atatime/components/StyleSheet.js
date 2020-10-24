@@ -43,10 +43,11 @@ export const styles = StyleSheet.create({
     },
 
     container: {},
+
     card: {
       marginTop: 100,
       backgroundColor: '#F05F40',
-      width: width - 80,
+      width: Dimensions.get('window').width - 80,
       margin: 10,
       height: 300,
       borderRadius: 10,
