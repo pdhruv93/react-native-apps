@@ -22,6 +22,7 @@ export default FBLoginButton = (props) => {
           } 
           else{
             console.log("User pressed Login Button and login was successful!!");
+            props.navigation.replace('MainScreenWrapper');
           }
         }
       }
@@ -36,7 +37,7 @@ export default FBLoginButton = (props) => {
           })
           .then(()=>{
             console.log("Device Id Unregisetered!!");
-            props.navigation.replace('Login');
+            props.navigation.replace('LoginScreen');
           })
         }
       }
