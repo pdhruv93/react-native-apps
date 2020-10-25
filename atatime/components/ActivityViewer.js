@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Text, Dimensions, ScrollView, View} from 'react-native';
+import {Text, Dimensions, ScrollView, View, Linking} from 'react-native';
 import { Avatar, Button} from 'react-native-paper';
 
 import database from '@react-native-firebase/database';
@@ -161,9 +161,15 @@ export default ActivityViewer = (props)=> {
                             </Text>
                             <Text style={styles.cardText}>{usersPerformingSameActivity[key].location}</Text>
                             <Text>{"\n"}</Text>
-                            <Button mode="contained" style={{display: key==userDetails.userId ? 'none' : '' }} onPress={() => Linking.openURL('https://m.me/'+usersPerformingSameActivity[key].screenName)} >
-                                Chat on Messenger
-                            </Button>
+                            {
+                                key==userDetails.userId || usersPerformingSameActivity[key].screenName==""
+                                ? 
+                                    <Text>""</Text>
+                                : 
+                                    <Button mode="contained" onPress={() => Linking.openURL('https://m.me/'+usersPerformingSameActivity[key].screenName)} >
+                                        Chat on Messenger
+                                    </Button>
+                            }
                         </View>
                     )
                 }
