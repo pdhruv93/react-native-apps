@@ -56,3 +56,22 @@ https://reactnative.dev/docs/signed-apk-android
 
 8. Build .aab: gradlew bundleRelease
 Build .apk: gradlew assembleRelease
+
+9. 
+======================================================
+Key Hashes for Facebook Login: Concept explained
+======================================================
+1. You have to generate a keystore for your application. A keystore can have multiple private keys each with a unique alias.
+
+keytool -genkeypair -v -keystore <any-name-for-your-keystore>.keystore -alias <any-name-for-your-private-key> -keyalg RSA -keysize 2048 -validity 10000
+
+Copy the generated .keystore file to /android/app directory. There are more steps after this for which you can follow point 7 above. These steps make your keystore as release level keystore and your key as release key. Any hashes generated using this keystore+private key will be called release hashes.
+
+2. For signing an app or generating a new hash, you need to utilize the release-keystore+release-key which you generated in step1.
+keytool -exportcert -alias <alias-which-you-used-in-step1> -keystore <full-path-of-the-keystore-file-kept-under-android/app> | openssl sha1 -binary | openssl base64
+ 
+ example:
+ keytool -exportcert -alias atatime -keystore C:\dhruv-react-native-workspace\react-native-apps\atatime\android\app\atatime.keystore | openssl sha1 -binary | openssl base64
+ 
+ Copy the unique key-hash generated to developers.facebook.com>basic settings
+
