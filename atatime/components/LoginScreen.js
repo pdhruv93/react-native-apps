@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {Dimensions,StyleSheet,Text,View} from 'react-native';
+import {Text,View} from 'react-native';
 import {AccessToken} from 'react-native-fbsdk';
 
-
+import {styles} from './StyleSheet';
 import FBLoginButton from './FBLoginButton';
 
-function LoginScreen({navigation}) {
+export default LoginScreen = (props) => {
   
   setTimeout(() =>{
 
@@ -14,7 +14,7 @@ function LoginScreen({navigation}) {
        if(data!=null)
        {
          console.log('User has correct access Token Redirecting to MainScreenWrapper!!! Response');
-         navigation.replace('MainScreenWrapper');
+         props.navigation.replace('MainScreenWrapper');
        }
       });
 
@@ -24,40 +24,22 @@ function LoginScreen({navigation}) {
 
   return (
 
-      <View style={[styles.screen, styles.aboutScreen]}>
+      <View style={[styles.screen, styles.redBackground]}>
 
-        <Text style={{fontSize: 32, color:"white"}}>
+        <Text style={[styles.boldText, styles.whiteText, {fontSize: 32}]}>
           We've got what you need!  
         </Text>
         
-        <Text style={{fontSize: 16, color:"rgba(255, 255, 255, 0.7)", textAlign: "center", margin: 20}}>
+        <Text style={[styles.text, styles.whiteText, {fontSize: 16}]}>
           mark your current activity with Tags. and check how many others are doing the same activity...And thats it. @@time is ready!!
         </Text>
         
 
         <Text>{"\n"}</Text>
         
-        <FBLoginButton navigation={navigation}/>
+        <FBLoginButton navigation={props.navigation}/>
 
       </View>
   
   );
 };
-
-
-
-const styles = StyleSheet.create({
-
-  screen: {
-    flexDirection: 'column', 
-    height: Dimensions.get('window').height,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  aboutScreen: {
-    backgroundColor: '#F05F40',
-  }
-
-});
-
-export default LoginScreen;

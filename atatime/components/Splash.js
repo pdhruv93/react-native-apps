@@ -1,21 +1,21 @@
 import * as React from 'react';
 import {View, Text } from 'react-native';
 
-function Splash({navigation}) {
+import {styles} from './StyleSheet';
+
+export default function Splash({navigation}) {
 
     setTimeout(() =>{
-        navigation.replace('Login');
+        navigation.replace('LoginScreen');
     }, 4000);
 
   return (
-    <View style={{backgroundColor: '#F05F40', flex:1, justifyContent:'center', alignItems:'center'}}>
+    <View style={[styles.screen, styles.redBackground]}>
 
-        <Text style={{color: 'white', fontSize: 40, fontWeight:"bold"}}>
+        <Text style={[styles.text, styles.whiteText, styles.boldText, {fontSize: 40}]}>
            @@time
         </Text>
 
     </View>
   );
 }
-
-export default Splash;
