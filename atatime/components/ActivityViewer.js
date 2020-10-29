@@ -3,6 +3,7 @@ import {Text, Dimensions, ScrollView, View, Linking} from 'react-native';
 import { Avatar, Button} from 'react-native-paper';
 
 import database from '@react-native-firebase/database';
+import publicIP from 'react-native-public-ip';
 import axios from 'axios';
 
 import { UtilityContext } from './MainScreenWrapper';
@@ -23,14 +24,15 @@ export default ActivityViewer = (props)=> {
 
 
 
-    const sendNotificationToUsers = async () =>{
+    const sendNotificationToUsers = async (data) =>{
         console.log("Sending Notifications to all users who are performing same activity...");
         let deviceIds=[];
-        Object.keys(usersPerformingSameActivity).map(key => {
-            if(usersPerformingSameActivity[key]!=userDetails.userId)
-                deviceIds.push(usersPerformingSameActivity[key].deviceId);
+        Object.keys(data).map(key => {
+            if(data[key]!=userDetails.userId)
+                deviceIds.push(data[key].deviceId);
         })
 
+        console.log("Devices to which Push Notification will be sent:"+deviceIds);
         if(deviceIds.length>0)
         {
             axios.post('https://fcm.googleapis.com/fcm/send',{
@@ -75,8 +77,8 @@ export default ActivityViewer = (props)=> {
             let data = snapshot.val();
             console.log("Successfully Fecthed all users who are performing same activity !!");
             console.log("Users who are performing same activity:"+JSON.stringify(data));
+            sendNotificationToUsers(data);
             setUsersPerformingSameActivity(data);
-            sendNotificationToUsers();
         });
     }
 
@@ -107,21 +109,30 @@ export default ActivityViewer = (props)=> {
 
     const getUserCurrentLocation = async () =>{
         
-        console.log("Getting current Location for User!!");
+        console.log("Inside getUserCurrentLocation().....");
 
-        console.log("Getting current Location for User From IP Address!!");
-        fetch('http://ip-api.com/json')
-        .then((response) => response.json())
-        .then((response) => {
-            currentLocation=response.city+", "+response.country;
-            console.log("USer's Location"+currentLocation);
+        await publicIP()
+        .then(ip => {
+            console.log("IP address for user:"+ip);
+            console.log("Getting current Location for User From IP Address!!");
+            fetch('https://api.ipgeolocationapi.com/geolocate/'+ip)
+            .then((response) => response.json())
+            .then((response) => {
+                currentLocation=response.name;
+                console.log("USer's Location"+currentLocation);
+                createNewEntryInUserActivityTable();
+            })
+            .catch((error) => {
+                console.log("Error while getting Location from IP address!!");
+                console.error(error);
+                createNewEntryInUserActivityTable();
+            })
         })
-        .catch((error) => {
-            console.error(error);
-        })
-        .finally(()=>{
+        .catch(error => {
+            console.log("Unable to fetch User's IP Address!!");
+            console.log(error);
             createNewEntryInUserActivityTable();
-        });
+        })
 
     }
 
@@ -148,6 +159,7 @@ export default ActivityViewer = (props)=> {
 
 
     if(usersPerformingSameActivity!=null && Object.keys(usersPerformingSameActivity).length>0 ){
+        console.log("Preparing Final View to render!!!All set to GOOOOO!!!");
         return(
             <ScrollView style={styles.container} horizontal= {true} decelerationRate={0} snapToInterval={Dimensions.get('window').width - 60} snapToAlignment={"center"} contentInset={{top: 0,left: 30,bottom: 0,right: 30,}} >
                 {
