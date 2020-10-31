@@ -29,11 +29,12 @@ export default ActivityViewer = (props)=> {
         console.log("Sending Notifications to all users who are performing same activity...");
         let deviceIds=[];
         Object.keys(data).map(key => {
-            if(data[key]!=userDetails.userId)
+            //console.log("Current User Id:"+userDetails.userId+", User with same activity id:"+key);
+            if(key!=userDetails.userId)
                 deviceIds.push(data[key].deviceId);
         })
 
-        console.log("Devices to which Push Notification will be sent:"+deviceIds);
+        //console.log("Devices to which Push Notification will be sent:"+deviceIds);
         if(deviceIds.length>0)
         {
             axios.post('https://fcm.googleapis.com/fcm/send',{
@@ -74,7 +75,7 @@ export default ActivityViewer = (props)=> {
     const fetchAllUsersWithSameActivity = async () =>{
         console.log("Fetching all users who are performing same activity...");
         database().ref('/userActivities/'+selectedActivity)
-        .on('value', (snapshot) => {
+        .once('value', (snapshot) => {
             let data = snapshot.val();
             console.log("Successfully Fecthed all users who are performing same activity !!");
             console.log("Users who are performing same activity:"+JSON.stringify(data));
@@ -178,7 +179,7 @@ export default ActivityViewer = (props)=> {
                     Object.keys(usersPerformingSameActivity).map(key => 
                         <View key={key} style={styles.card}>
                             <Text>{"\n"}</Text>
-                            <SpinAnimation imageURL={usersPerformingSameActivity[key].profilePicURL} />
+                            <Avatar.Image size={70} source={{ uri:usersPerformingSameActivity[key].profilePicURL }}/>
                             <Text>{"\n"}</Text>
                             <Text style={[styles.cardText, styles.boldText]} >
                                 {key==userDetails.userId ? "It's you" : usersPerformingSameActivity[key].userName}
