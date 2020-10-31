@@ -144,7 +144,7 @@ export default ActivityViewer = (props)=> {
             console.log("User deleted activity by himself. Delete Completed!!");
             scrollRef.current?.scrollTo({x: 0, y: 0});
             setSelectedActivity("");
-            //setUsersPerformingSameActivity([]);
+            setUsersPerformingSameActivity([]);
         })
     }
 
