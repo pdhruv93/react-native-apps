@@ -1,12 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {Text, Dimensions, ScrollView, View, Linking} from 'react-native';
-import { Avatar, Button} from 'react-native-paper';
+import { Avatar, Button, IconButton, Colors } from 'react-native-paper';
 
 import database from '@react-native-firebase/database';
 import publicIP from 'react-native-public-ip';
 import axios from 'axios';
 
 import { UtilityContext } from './MainScreenWrapper';
+import SpinAnimation from './RotatingImage';
 import {ActivityContext} from './MainScreen';
 import {styles} from './StyleSheet';
 
@@ -17,8 +18,8 @@ export default ActivityViewer = (props)=> {
 
     const [usersPerformingSameActivity, setUsersPerformingSameActivity] = useState([]);
 
-    let {userDetails}=useContext(UtilityContext);
-    const {selectedActivity}=useContext(ActivityContext);
+    let {scrollRef, userDetails}=useContext(UtilityContext);
+    const {selectedActivity, setSelectedActivity}=useContext(ActivityContext);
     let currentLocation="";
 
 
@@ -73,7 +74,7 @@ export default ActivityViewer = (props)=> {
     const fetchAllUsersWithSameActivity = async () =>{
         console.log("Fetching all users who are performing same activity...");
         database().ref('/userActivities/'+selectedActivity)
-        .once('value', (snapshot) => {
+        .on('value', (snapshot) => {
             let data = snapshot.val();
             console.log("Successfully Fecthed all users who are performing same activity !!");
             console.log("Users who are performing same activity:"+JSON.stringify(data));
@@ -137,6 +138,17 @@ export default ActivityViewer = (props)=> {
     }
 
 
+    const deleteMyCurrentActivity = async () =>{
+        await database().ref("/userActivities/"+selectedActivity+"/"+userDetails.userId).remove()
+        .then(()=>{
+            console.log("User deleted activity by himself. Delete Completed!!");
+            scrollRef.current?.scrollTo({x: 0, y: 0});
+            setSelectedActivity("");
+            //setUsersPerformingSameActivity([]);
+        })
+    }
+
+
 
 
     useEffect(() => {
@@ -166,7 +178,7 @@ export default ActivityViewer = (props)=> {
                     Object.keys(usersPerformingSameActivity).map(key => 
                         <View key={key} style={styles.card}>
                             <Text>{"\n"}</Text>
-                            <Avatar.Image size={70} source={{ uri:usersPerformingSameActivity[key].profilePicURL }}/>
+                            <SpinAnimation imageURL={usersPerformingSameActivity[key].profilePicURL} />
                             <Text>{"\n"}</Text>
                             <Text style={[styles.cardText, styles.boldText]} >
                                 {key==userDetails.userId ? "It's you" : usersPerformingSameActivity[key].userName}
@@ -176,11 +188,20 @@ export default ActivityViewer = (props)=> {
                             {
                                 key==userDetails.userId || usersPerformingSameActivity[key].screenName==""
                                 ? 
-                                    <Text>""</Text>
+                                    <Text></Text>
                                 : 
+                                    
                                     <Button mode="contained" onPress={() => Linking.openURL('https://m.me/'+usersPerformingSameActivity[key].screenName)} >
                                         Chat on Messenger
                                     </Button>
+                            }
+
+                            {
+                                 key==userDetails.userId
+                                 ? 
+                                    <IconButton icon="delete" color={Colors.white} style={{alignSelf: 'flex-end'}} size={20} onPress={() => deleteMyCurrentActivity()} />
+                                 : 
+                                    <Text></Text>
                             }
                         </View>
                     )

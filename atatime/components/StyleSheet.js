@@ -65,6 +65,10 @@ export const styles = StyleSheet.create({
     cardText :{
         fontSize: 18, 
         color:"white"
+    },
+
+    roundedImage:{
+      borderRadius: 50
     }
   
   });
